@@ -1,12 +1,15 @@
 import cv2
 import numpy as np
+import argparse
+
 
 def euc_dist(pixel, centroid):
     return np.linalg.norm(pixel - centroid)
 
+
 class KMeansModel:
 
-    def __init__(self, img_data, k=5):
+    def __init__(self, img_data, k):
         self.centroids = np.empty(shape=(k, 3), dtype=int)
         self.k = k
         self.width = len(img_data)
@@ -34,7 +37,6 @@ class KMeansModel:
                 num_changes += 1
         return num_changes, total_mse
 
-
     def update(self):
         for i in range(self.k):
             total = np.zeros(3, dtype=int)
@@ -53,7 +55,8 @@ class KMeansModel:
     def unflatten(self):
         self.data = self.data.reshape( (self.width, self.height, 3) )
 
-    def evaluate(self, max_iters=20): 
+    def evaluate(self, max_iters): 
+        print(f'Training K-means model on image, with k={self.k} clusters/centroids and max_iters={max_iters}  ...')
         for i in range(max_iters):
             (num_changes, total_mse) = self.assignment()
             if num_changes == 0:
@@ -66,16 +69,24 @@ class KMeansModel:
         self.unflatten()
         
 
-
-
 def main():
-    img = cv2.imread('fruits.jpg')
-    kmeans = KMeansModel(img, k=6)
-    kmeans.evaluate()
+    parser = argparse.ArgumentParser(description='Process arguments.')
+    parser.add_argument('--file', type=str, default='fruits.jpg')
+    parser.add_argument('--k', type=int, default=4)
+    parser.add_argument('--max_iters', type=int, default=35)
+    args = parser.parse_args()
+    
+    img = cv2.imread(args.file)
+    kmeans = KMeansModel(img, k=args.k)
+    kmeans.evaluate(max_iters=args.max_iters)
+
+    cv2.imwrite(f'kmeans_{args.file}_k-{args.k}_iters-{args.max_iters}.jpg', kmeans.data)
     cv2.imshow("kmeans", kmeans.data)
     cv2.waitKey(0)
 
-    
 
 if __name__ == '__main__':
     main()
+
+
+    
