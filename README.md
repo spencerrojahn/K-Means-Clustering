@@ -1,5 +1,5 @@
 # K-Means-Clustering
-K-Means clustering algorithms implemented in Python
+K-Means clustering algorithm implemented in Python
 
 * You can run the program with the following command:
     * *python3 kmeans.py \[--file image_file\] \[--k k-value\] \[--max_iters max-iterations\]*, where \[\] indicates optional fields
